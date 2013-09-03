@@ -8,11 +8,13 @@ class eucalyptus::sc ($cloud_name = "cloud1", $cluster_name = "cluster1") {
     package { 'eucalyptus-sc':
       ensure => present,
     }
-    service { 'eucalyptus-cloud':
-      ensure => running,
-      enable => true,
-      require => Package['eucalyptus-sc'],
-    } 
+    if !defined(Service['eucalyptus-cloud']) {
+      service { 'eucalyptus-cloud':
+        ensure => running,
+        enable => true,
+        require => Package['eucalyptus-sc'],
+      }
+    }
   }
 
   class eucalyptus::sc_config inherits eucalyptus::sc {

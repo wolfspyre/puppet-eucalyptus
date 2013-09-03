@@ -8,13 +8,16 @@ class eucalyptus::walrus ($cloud_name = "cloud1") {
     package { 'eucalyptus-walrus':
       ensure => present,
     }
-    service { 'eucalyptus-cloud':
-      ensure => running,
-      enable => true,
-      require => Package['eucalyptus-walrus'],
-    } 
-  } 
-  
+
+    if !defined(Service['eucalyptus-cloud']) {
+      service { 'eucalyptus-cloud':
+        ensure => running,
+        enable => true,
+        require => Package['eucalyptus-walrus'],
+      }
+    }
+  }
+
   class eucalyptus::walrus_config inherits eucalyptus::walrus {
     File <<|title == "${cloud_name}_euca.p12"|>>
   }
