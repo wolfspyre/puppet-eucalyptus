@@ -25,7 +25,7 @@ class eucalyptus::clc ($cloud_name = "cloud1") {
     # Cloud-wide
     @@file { "${cloud_name}_cloud_cert":
       path    => '/var/lib/eucalyptus/keys/cloud-cert.pem',
-      content => "$eucakeys_cloud_cert",
+      content => $eucakeys_cloud_cert,
       owner   => 'eucalyptus',
       group   => 'eucalyptus',
       mode    => '0700',
@@ -33,12 +33,13 @@ class eucalyptus::clc ($cloud_name = "cloud1") {
     }
     @@file { "${cloud_name}_cloud_pk":
       path    => '/var/lib/eucalyptus/keys/cloud-pk.pem',
-      content => "$eucakeys_cloud_pk",
+      content => $eucakeys_cloud_pk,
       owner   => 'eucalyptus',
       group   => 'eucalyptus',
       mode    => '0700',
       tag     => "${cloud_name}_cloud_pk",
     }
+    # this resource is only required when the SC and CLC aren't run from the same node
     @@file { "${cloud_name}_euca.p12":
       path      => '/var/lib/eucalyptus/keys/euca.p12',
       # content => $eucakeys_euca_p12,

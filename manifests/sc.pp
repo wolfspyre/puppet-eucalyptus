@@ -1,8 +1,8 @@
 class eucalyptus::sc ($cloud_name = "cloud1", $cluster_name = "cluster1") {
   include eucalyptus
   include eucalyptus::conf
-  Class[eucalyptus] -> Class[eucalyptus::sc]
-  Class[eucalyptus::repo] -> Package[eucalyptus-sc] -> Class[eucalyptus::sc_config]-> Eucalyptus_config<||> -> Service[eucalyptus-cloud]
+  Class[eucalyptus] -> Class[Eucalyptus::Conf] -> Class[eucalyptus::sc]
+  Package[eucalyptus-sc] -> Class[eucalyptus::sc_config]-> Eucalyptus_config<||> -> Service[eucalyptus-cloud]
 
   class eucalyptus::sc_install {
     package { 'eucalyptus-sc':

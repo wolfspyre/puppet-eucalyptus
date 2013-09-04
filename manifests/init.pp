@@ -1,5 +1,5 @@
-# This is the baseclass for Eucalyptus installs. This class the classes which 
-# set up the yum repos for Eucalyptus and its dependencies. 
+# This is the baseclass for Eucalyptus installs. This class the classes which
+# set up the yum repos for Eucalyptus and its dependencies.
 #
 # == Authors
 #
@@ -11,7 +11,10 @@
 #
 # Copyright 2012 Eucalyptus INC under the Apache 2.0 license
 #
-class eucalyptus 
+class eucalyptus
 {
-  include eucalyptus::repo, eucalyptus::extrarepo, eucalyptus::security
+  stage { 'before': before => Stage['main'] }
+  class {['eucalyptus::repo', 'eucalyptus::extrarepo', 'eucalyptus::security']:
+    stage => before,
+  }
 }
