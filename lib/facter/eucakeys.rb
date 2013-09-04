@@ -20,7 +20,8 @@ if File.directory?(eucakey_dir)
     if name.match(/\.p12/)
       Facter.add("eucakeys_euca_p12") do
         setcode do
-          Base64.encode64(File.read("#{eucakey_dir}/#{name}"))
+          # Eventually we can call Facter::Util::FileRead.read_binary
+          Base64.encode64(File.open("#{eucakey_dir}/#{name}", "rb") { |contents| contents.read })
         end
       end
     end
