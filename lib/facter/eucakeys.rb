@@ -2,6 +2,7 @@
 # Grab all eucalyptus key files and export them as facts so we can use them within the Eucalyptus module
 
 require 'facter'
+require 'base64'
 
 eucakey_dir = '/var/lib/eucalyptus/keys'
 
@@ -12,14 +13,14 @@ if File.directory?(eucakey_dir)
     if name.match(/\.pem/)
       Facter.add("eucakeys_#{name.sub('.pem','').sub('-','_')}") do
         setcode do
-          File.read("#{eucakey_dir}/#{name}")
+          Base64.encode64(File.read("#{eucakey_dir}/#{name}"))
         end
       end
     end
     if name.match(/\.p12/)
       Facter.add("eucakeys_euca_p12") do
         setcode do
-          File.read("#{eucakey_dir}/#{name}")
+          Base64.encode64(File.read("#{eucakey_dir}/#{name}"))
         end
       end
     end
@@ -36,7 +37,7 @@ if File.directory?(eucakey_dir)
      if keyname.match(/\.pem/)
        Facter.add("eucakeys_" + clustername + "_#{keyname.sub('.pem','').sub('-','_')}") do
          setcode do
-            File.read("#{eucakey_dir}/#{clustername}/#{keyname}")
+            Base64.encode64(File.read("#{eucakey_dir}/#{clustername}/#{keyname}"))
          end
        end
      end
@@ -44,7 +45,7 @@ if File.directory?(eucakey_dir)
      if keyname.match(/vtunpass/)
        Facter.add("eucakeys_" + clustername + "_#{keyname}") do
          setcode do
-            File.read("#{eucakey_dir}/#{clustername}/#{keyname}")
+            Base64.encode64(File.read("#{eucakey_dir}/#{clustername}/#{keyname}"))
          end
        end
      end
