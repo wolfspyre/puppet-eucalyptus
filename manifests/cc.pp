@@ -21,6 +21,7 @@ class eucalyptus::cc ($cloud_name = "cloud1", $cluster_name = "cluster1") {
     File <<|title == "${cloud_name}_${cluster_name}_cluster_pk"|>>
     File <<|title == "${cloud_name}_${cluster_name}_node_cert"|>>
     File <<|title == "${cloud_name}_${cluster_name}_node_pk"|>>
+    File <<|title == "${cloud_name}_${cluster_name}_vtunpass"|>>
   }
 
   class eucalyptus::cc_reg inherits eucalyptus::cc {
