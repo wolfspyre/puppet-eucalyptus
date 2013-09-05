@@ -18,7 +18,7 @@ class eucalyptus::drbd_config {
   # Load kernel module, requires kern_module.pp
   kern_module { "drbd": ensure => present, require => Package["drbd-kmod"], }
 
-# Tell Eucalyptus.conf that we're using DRBD  
+# Tell Eucalyptus.conf that we're using DRBD
 # We can only declare eucalyptus::conf once, we need to split the provider so it can take separate options
 #   class { 'eucalyptus::conf':
 #    cloud_opts => '-Dwalrus.storage.manager=DRBDStorageManager',

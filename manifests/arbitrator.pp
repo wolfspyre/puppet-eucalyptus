@@ -1,16 +1,16 @@
 # Arbitrator support (For use in HA mode)
 #
 # Eucalyptus uses a periodic ICMP echo / ping test to an external IP address.
-# This test approximates an end user's ability to access the system. If Eucalyptus determines 
+# This test approximates an end user's ability to access the system. If Eucalyptus determines
 # that it cannot reach the host associated with a registered Arbitrator, all Eucalyptus
 # services operating on that host attempt to failover to the alternate hosts running those services
 #
 # == Parameters
 #
 # [*partition_name*] Unique name for the arbitrator in the cloud
-# [*service_host*] Host this arbitrator/ping will run from 
+# [*service_host*] Host this arbitrator/ping will run from
 # [*gateway_host*] Host to ping to check for connectivity, could be the gateway
-# 
+#
 # == Examples
 #
 #  eucalyptus::arbitrator { 'clc_arbitrator01':
