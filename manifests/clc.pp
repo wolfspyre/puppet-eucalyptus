@@ -57,11 +57,19 @@ class eucalyptus::clc (
     if $::eucakeys_euca_p12 {
       @@file { "${cloud_name}_euca.p12":
         path      => '/var/lib/eucalyptus/keys/euca.p12',
-        # content => base64('decode', $::eucakeys_euca_p12),
-        source    => 'puppet:///keys/euca.p12',
         owner     => 'eucalyptus',
         group     => 'eucalyptus',
         mode      => '0700',
+        tag       => "${cloud_name}_euca.p12",
+      }
+
+      # This is a hack to fix issues with shipping binary files with puppet
+      # Its required both post puppetdb and ruby 1.9
+
+      @@exec { "${cloud_name}_euca.p12":
+        command   => "/bin/echo \'${::eucakeys_euca_p12}\' | \
+        /usr/bin/openssl base64 -d > /var/lib/eucalyptus/keys/euca.p12",
+        unless    => '/usr/bin/test -s /var/lib/eucalyptus/keys/euca.p12',
         tag       => "${cloud_name}_euca.p12",
       }
     }

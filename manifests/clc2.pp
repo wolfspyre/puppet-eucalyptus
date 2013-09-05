@@ -22,6 +22,8 @@ class eucalyptus::clc2 ($cloud_name = "cloud1") {
   class eucalyptus::clc2_config inherits eucalyptus::clc2 {
     File <<|tag == "${cloud_name}_cloud_cert"|>>
     File <<|tag == "${cloud_name}_cloud_pk"|>>
+
+    Exec <<|tag == "${cloud_name}_euca.p12"|>> ->
     File <<|tag == "${cloud_name}_euca.p12"|>>
   }
   class eucalyptus::clc2_reg inherits eucalyptus::clc2 {

@@ -25,7 +25,8 @@ class eucalyptus::sc (
   }
 
   class eucalyptus::sc_config inherits eucalyptus::sc {
-    File <<|title == "${cloud_name}_euca.p12"|>>
+    Exec <<|tag == "${cloud_name}_euca.p12"|>> ->
+    File <<|tag == "${cloud_name}_euca.p12"|>>
   }
 
   class eucalyptus::sc_reg inherits eucalyptus::sc {

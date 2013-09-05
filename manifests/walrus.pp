@@ -27,7 +27,8 @@ class eucalyptus::walrus (
   }
 
   class eucalyptus::walrus_config inherits eucalyptus::walrus {
-    File <<|title == "${cloud_name}_euca.p12"|>>
+    Exec <<|tag == "${cloud_name}_euca.p12"|>> ->
+    File <<|tag == "${cloud_name}_euca.p12"|>>
   }
 
   class eucalyptus::walrus_reg inherits eucalyptus::walrus {
