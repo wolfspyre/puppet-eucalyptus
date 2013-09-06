@@ -25,14 +25,14 @@ class eucalyptus::repo {
         name    => "eucalyptus",
         descr   => "Eucalyptus Repository",
         enabled => 1,
-        baseurl => "http://downloads.eucalyptus.com/software/eucalyptus/3.1/rhel/\$releasever/\$basearch",
+        baseurl => "http://downloads.eucalyptus.com/software/eucalyptus/3.3/rhel/\$releasever/\$basearch",
         gpgkey  => "http://www.eucalyptus.com/sites/all/files/c1240596-eucalyptus-release-key.pub",
       }
       yumrepo { "Euca2ools-repo":
         name    => "euca2ools",
         descr   => "Euca2ools Repository",
         enabled => 1,
-        baseurl => "http://downloads.eucalyptus.com/software/euca2ools/2.1/rhel/\$releasever/\$basearch",
+        baseurl => "http://downloads.eucalyptus.com/software/euca2ools/3.0/rhel/\$releasever/\$basearch",
         gpgkey  => "http://www.eucalyptus.com/sites/all/files/c1240596-eucalyptus-release-key.pub",
       }
     }
