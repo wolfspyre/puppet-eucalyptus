@@ -1,0 +1,10 @@
+name    'dhgwilliam-eucalyptus'
+version '0.1.0'
+source  'https://github.com/dhgwilliam/puppetlabs-eucalyptus'
+author  'David Gwilliam'
+license 'Apache License 2.0'
+summary 'Eucalyptus Module'
+description 'Puppet module to install and configure Eucalyptus IaaS'
+project_page 'https://github.com/dhgwilliam/puppetlabs-eucalyptus'
+
+dependency 'puppetlabs/stdlib', '>= 0.1.7'

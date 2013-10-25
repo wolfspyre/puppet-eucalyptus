@@ -1,4 +1,4 @@
-# This class sets up the repos for Eucalyptus and dependencies. 
+# This class sets up the repos for Eucalyptus and dependencies.
 #
 # == Parameters
 #
@@ -19,20 +19,20 @@
 class eucalyptus::repo {
   # Check which OS we are installing on
   case $operatingsystem  {
-    # there should a way to distinguish 
+    # there should a way to distinguish
     redhat, centos : {
       yumrepo { "Eucalyptus-repo":
         name    => "eucalyptus",
         descr   => "Eucalyptus Repository",
         enabled => 1,
-        baseurl => "http://downloads.eucalyptus.com/software/eucalyptus/3.1/rhel/\$releasever/\$basearch",
+        baseurl => "http://downloads.eucalyptus.com/software/eucalyptus/3.3/rhel/\$releasever/\$basearch",
         gpgkey  => "http://www.eucalyptus.com/sites/all/files/c1240596-eucalyptus-release-key.pub",
       }
       yumrepo { "Euca2ools-repo":
         name    => "euca2ools",
         descr   => "Euca2ools Repository",
         enabled => 1,
-        baseurl => "http://downloads.eucalyptus.com/software/euca2ools/2.1/rhel/\$releasever/\$basearch",
+        baseurl => "http://downloads.eucalyptus.com/software/euca2ools/3.0/rhel/\$releasever/\$basearch",
         gpgkey  => "http://www.eucalyptus.com/sites/all/files/c1240596-eucalyptus-release-key.pub",
       }
     }
@@ -62,7 +62,7 @@ class eucalyptus::extrarepo {
   case $operatingsystem  {
     centos, redhat : {
       # Install other repository required for Eucalyptus
-      # Eucalyptus is keeping a copy of their repository RPM 
+      # Eucalyptus is keeping a copy of their repository RPM
       # So we can install their repo package directly from Eucalyptus repo
       $repo_packages = ['elrepo-release', 'epel-release']
         package { $repo_packages:
@@ -71,4 +71,4 @@ class eucalyptus::extrarepo {
       }
     }
   }
-} 
+}

@@ -7,7 +7,7 @@
 #
 # [*property_name*] The name of the property to modify
 # [*property_value*] The value to set the property to
-# 
+#
 # == Examples
 #
 #  eucalyptus::cloud_properties { 'increasevolsize':

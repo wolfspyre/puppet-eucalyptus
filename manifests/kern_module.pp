@@ -1,7 +1,7 @@
 # Load or Unload a kernel module
 # Inspired by: http://projects.puppetlabs.com/projects/1/wiki/Kernel_Modules_Patterns
 #
-# == Parameters 
+# == Parameters
 # [*name*] - name of kernel module to load
 #
 # == Examples
@@ -16,7 +16,7 @@
 define kern_module ($ensure) {
     case $ensure {
         present: {
-            exec { "insert_module_${name}": 
+            exec { "insert_module_${name}":
               command => "/sbin/modprobe ${name}",
               unless  => "/bin/grep -q '^${name} ' '/proc/modules'",
             }
