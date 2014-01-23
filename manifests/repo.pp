@@ -21,19 +21,28 @@ class eucalyptus::repo {
   case $operatingsystem  {
     # there should a way to distinguish
     redhat, centos : {
+      file { '/etc/pki/rpm-gpg/eucalyptus-release.pub':
+        ensure => present,
+        mode   => '0644',
+        owner  => root,
+        group  => root,
+        source => 'puppet:///modules/eucalyptus/c1240596-eucalyptus-release-key.pub',
+      }
       yumrepo { "Eucalyptus-repo":
         name    => "eucalyptus",
         descr   => "Eucalyptus Repository",
         enabled => 1,
         baseurl => "http://downloads.eucalyptus.com/software/eucalyptus/3.3/rhel/\$releasever/\$basearch",
-        gpgkey  => "http://www.eucalyptus.com/sites/all/files/c1240596-eucalyptus-release-key.pub",
+        gpgkey  => 'file:///etc/pki/rpm-gpg/eucalyptus-release.pub',
+        require => File['/etc/pki/rpm-gpg/eucalyptus-release.pub'],
       }
       yumrepo { "Euca2ools-repo":
         name    => "euca2ools",
         descr   => "Euca2ools Repository",
         enabled => 1,
         baseurl => "http://downloads.eucalyptus.com/software/euca2ools/3.0/rhel/\$releasever/\$basearch",
-        gpgkey  => "http://www.eucalyptus.com/sites/all/files/c1240596-eucalyptus-release-key.pub",
+        gpgkey  => 'file:///etc/pki/rpm-gpg/eucalyptus-release.pub',
+        require => File['/etc/pki/rpm-gpg/eucalyptus-release.pub'],
       }
     }
     ubuntu : {
