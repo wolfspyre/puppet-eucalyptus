@@ -46,23 +46,21 @@ class eucalyptus::repo {
       }
     }
     ubuntu : {
-      apt::source { 'euca2ools':
-  					location   => 'http://downloads.eucalyptus.com/software/eucalyptus/3.1/ubuntu',
-  					repos      => 'main',
-  					key        => 'c1240596',
-  					key_server => 'pgp.mit.edu',
-	  }
-	  apt::source { 'eucalyptus':
-  					location   => 'http://downloads.eucalyptus.com/software/eucalyptus/3.1/ubuntu',
-  					repos      => 'main',
-  					key        => 'c1240596',
-  					key_server => 'pgp.mit.edu',
-	  }
-      exec {"update-repo":
-        command => "/usr/bin/apt-key add /tmp/c1240596-eucalyptus-release-key.pub; /usr/bin/apt-get update",
-        onlyif => "/usr/bin/test -f /etc/apt/sources.list.d/euca2ools.list",
+      file { '/etc/apt/trusted.gpg.d/eucalyptus-release.gpg':
+        ensure => present,
+        mode   => '0644',
+        owner  => root,
+        group  => root,
+        source => 'puppet:///modules/eucalyptus/c1240596-eucalyptus-release-key.gpg',
       }
-      Apt::Source<||> -> Exec["update-repo"] -> Package<||>
+      apt::source { 'eucalyptus':
+        location => 'http://downloads.eucalyptus.com/software/eucalyptus/3.1/ubuntu',
+        repos    => 'main',
+        require  => File['/etc/apt/trusted.gpg.d/eucalyptus-release.gpg'],
+      }
+    }
+    default : {
+      fail("${::operatingsystem} is not a supported operating system")
     }
   }
 }
