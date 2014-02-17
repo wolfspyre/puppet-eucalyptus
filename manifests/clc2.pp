@@ -26,6 +26,10 @@ class eucalyptus::clc2 ($cloud_name = "cloud1") {
     Exec <<|tag == "${cloud_name}_euca.p12"|>> ->
     File <<|tag == "${cloud_name}_euca.p12"|>>
   }
+
+  $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
+  $host = getvar("ipaddress_${registerif}")
+
   class eucalyptus::clc2_reg inherits eucalyptus::clc2 {
     @@exec { "reg_clc_${::hostname}":
       command => "/usr/sbin/euca_conf \
@@ -34,10 +38,10 @@ class eucalyptus::clc2 ($cloud_name = "cloud1") {
       --no-sync \
       --register-cloud \
       --partition eucalyptus \
-      --host ${::ipaddress} \
+      --host ${host} \
       --component clc_${::hostname}",
       unless => "/usr/sbin/euca_conf --list-clouds | \
-      /bin/grep '\b${::ipaddress}\b'",
+      /bin/grep '\b${host}\b'",
       tag => $cloud_name,
     }
   }

@@ -34,6 +34,9 @@ class eucalyptus::cc (
     File <<|title == "${cloud_name}_${cluster_name}_vtunpass"|>>
   }
 
+  $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
+  $host = getvar("ipaddress_${registerif}")
+
   class eucalyptus::cc_reg inherits eucalyptus::cc {
 
     Class[eucalyptus::cc_reg] -> Class[eucalyptus::cc_config]
@@ -45,10 +48,10 @@ class eucalyptus::cc (
       --no-sync \
       --register-cluster \
       --partition ${cluster_name} \
-      --host ${::ipaddress} \
+      --host ${host} \
       --component cc_${::hostname}",
       unless   => "/usr/sbin/euca_conf --list-clusters | \
-      /bin/grep -q '\b${::ipaddress}\b'",
+      /bin/grep -q '\b${host}\b'",
       tag      => $cloud_name,
     }
 
