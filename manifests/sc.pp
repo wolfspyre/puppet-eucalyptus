@@ -31,6 +31,9 @@ class eucalyptus::sc (
     File <<|title == "${cloud_name}_${cluster_name}_cluster_pk"|>>
   }
 
+  $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
+  $host = getvar("ipaddress_${registerif}")
+
   class eucalyptus::sc_reg inherits eucalyptus::sc {
 
     Class[eucalyptus::sc_reg] -> Class[eucalyptus::sc_config]
@@ -42,10 +45,10 @@ class eucalyptus::sc (
       --no-sync \
       --register-sc \
       --partition ${cluster_name} \
-      --host ${::ipaddress} \
+      --host ${host} \
       --component sc_${::hostname}",
       unless   => "/usr/sbin/euca_conf --list-scs | \
-      /bin/grep '\b${::ipaddress}\b'",
+      /bin/grep '\b${host}\b'",
       tag      => $cloud_name,
     }
   }

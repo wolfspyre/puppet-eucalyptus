@@ -29,6 +29,9 @@ class eucalyptus::nc (
     File <<|title == "${cloud_name}_cloud_cert"|>>
   }
 
+  $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
+  $host = getvar("ipaddress_${registerif}")
+
   class eucalyptus::nc_reg inherits eucalyptus::nc {
     #Eucalyptus_config <||> { notify => Service["eucalyptus-nc"] }
     # Causes too many service refreshes
@@ -38,8 +41,8 @@ class eucalyptus::nc (
       --no-rsync \
       --no-sync \
       --no-scp \
-      --register-nodes ${::ipaddress}",
-      unless   => "/bin/grep -i '\b${::ipaddress}\b' /etc/eucalyptus/eucalyptus.conf",
+      --register-nodes ${host}",
+      unless   => "/bin/grep -i '\b${host}\b' /etc/eucalyptus/eucalyptus.conf",
       tag      => "${cloud_name}_${cluster_name}_reg_nc",
     }
   }

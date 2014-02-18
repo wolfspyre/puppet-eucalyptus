@@ -31,6 +31,9 @@ class eucalyptus::walrus (
     File <<|tag == "${cloud_name}_euca.p12"|>>
   }
 
+  $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
+  $host = getvar("ipaddress_${registerif}")
+
   class eucalyptus::walrus_reg inherits eucalyptus::walrus {
     @@exec { "reg_walrus_${::hostname}":
       command  => "/usr/sbin/euca_conf \
@@ -39,10 +42,10 @@ class eucalyptus::walrus (
       --no-sync \
       --register-walrus \
       --partition walrus \
-      --host ${::ipaddress} \
+      --host ${host} \
       --component walrus_${::hostname}",
       unless   => "/usr/sbin/euca_conf --list-walruses | \
-      /bin/grep '\b${::ipaddress}\b'",
+      /bin/grep '\b${host}\b'",
       tag      => $cloud_name,
     }
   }
