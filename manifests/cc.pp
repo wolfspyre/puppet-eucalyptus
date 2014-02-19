@@ -39,7 +39,7 @@ class eucalyptus::cc (
 
   class eucalyptus::cc_reg inherits eucalyptus::cc {
 
-    Class[eucalyptus::cc_reg] -> Class[eucalyptus::cc_config]
+    Class[eucalyptus::cc_config] -> Class[eucalyptus::cc_reg]
 
     @@exec { "reg_cc_${::hostname}":
       command  => "/usr/sbin/euca_conf \
