@@ -16,66 +16,85 @@
 # Copyright 2012 Eucalyptus INC under the Apache 2.0 license
 #
 
-class eucalyptus::repo {
-  # Check which OS we are installing on
-  case $operatingsystem  {
-    # there should a way to distinguish
-    redhat, centos : {
-      file { '/etc/pki/rpm-gpg/eucalyptus-release.pub':
-        ensure => present,
-        mode   => '0644',
-        owner  => root,
-        group  => root,
-        source => 'puppet:///modules/eucalyptus/c1240596-eucalyptus-release-key.pub',
-      }
-      yumrepo { "Eucalyptus-repo":
-        name    => "eucalyptus",
-        descr   => "Eucalyptus Repository",
-        enabled => 1,
-        baseurl => "http://downloads.eucalyptus.com/software/eucalyptus/3.3/rhel/\$releasever/\$basearch",
-        gpgkey  => 'file:///etc/pki/rpm-gpg/eucalyptus-release.pub',
-        require => File['/etc/pki/rpm-gpg/eucalyptus-release.pub'],
-      }
-      yumrepo { "Euca2ools-repo":
-        name    => "euca2ools",
-        descr   => "Euca2ools Repository",
-        enabled => 1,
-        baseurl => "http://downloads.eucalyptus.com/software/euca2ools/3.0/rhel/\$releasever/\$basearch",
-        gpgkey  => 'file:///etc/pki/rpm-gpg/eucalyptus-release.pub',
-        require => File['/etc/pki/rpm-gpg/eucalyptus-release.pub'],
-      }
-    }
-    ubuntu : {
-      file { '/etc/apt/trusted.gpg.d/eucalyptus-release.gpg':
-        ensure => present,
-        mode   => '0644',
-        owner  => root,
-        group  => root,
-        source => 'puppet:///modules/eucalyptus/c1240596-eucalyptus-release-key.gpg',
-      }
-      apt::source { 'eucalyptus':
-        location => 'http://downloads.eucalyptus.com/software/eucalyptus/3.1/ubuntu',
-        repos    => 'main',
-        require  => File['/etc/apt/trusted.gpg.d/eucalyptus-release.gpg'],
-      }
-    }
-    default : {
-      fail("${::operatingsystem} is not a supported operating system")
-    }
-  }
-}
+class eucalyptus::repo(
+  $epel_repo_enable      = true,
+  $euca2ools_repo_enable = true,
+  $euca_repo_enable      = true,
+  $manage_repos          = true,
+  ) {
+  validate_bool(
+    $euca_repo_enable,
+    $euca2ools_repo_enable,
+    $epel_repo_enable,
+    $manage_repos,
+  )
+  if $manage_repos {
+    # Check which OS we are installing on
+    case $::operatingsystem  {
+      redhat, centos : {
+        file { '/etc/pki/rpm-gpg/RPM-GPG-KEY-eucalyptus-release':
+          ensure => present,
+          mode   => '0644',
+          owner  => root,
+          group  => root,
+          source => 'puppet:///modules/eucalyptus/c1240596-eucalyptus-release-key.pub',
+        }
+        if $euca_repo_enable {
+          $_euca_repo_ensure = 'present'
+        } else {
+          $_euca_repo_ensure = 'absent'
+        }
+        if $euca2ools_repo_enable {
+          $_euca2ools_repo_ensure = 'present'
+        } else {
+          $_euca2ools_repo_ensure = 'absent'
+        }
+        if $epel_repo_enable {
+          $_epel_repo_ensure = 'present'
+        } else {
+          $_epel_repo_ensure = 'absent'
+        }
+        yumrepo { 'eucalyptus':
+          ensure     => $_euca_repo_ensure,
+          name       => 'eucalyptus',
+          descr      => 'Eucalyptus 4.0',
+          enabled    => 1,
+          mirrorlist => 'http://mirrors.eucalyptus.com/mirrors?product=eucalyptus&distro=centos&releasever=\$releasever&basearch=\$basearch&version=4.0',
+          gpgkey     => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-eucalyptus-release',
+          require    => File['/etc/pki/rpm-gpg/RPM-GPG-KEY-eucalyptus-release'],
+        }
+        file {'/etc/yum.repos.d/eucalyptus.repo':
+          ensure => $_euca_repo_ensure,
+        }
+        yumrepo { 'euca2ools':
+          ensure     => $_euca2ools_repo_ensure,
+          name       => 'euca2ools',
+          descr      => 'Euca2ools 3.1',
+          enabled    => 1,
+          mirrorlist => 'http://mirrors.eucalyptus.com/mirrors?product=euca2ools&distro=centos&releasever=$releasever&basearch=$basearch&version=3.1',
+          gpgkey     => '/etc/pki/rpm-gpg/RPM-GPG-KEY-eucalyptus-release',
+          require    => File['/etc/pki/rpm-gpg/RPM-GPG-KEY-eucalyptus-release'],
+        }
+        file {'/etc/yum.repos.d/euca2ools.repo':
+          ensure => $_euca2ools_repo_ensure,
+        }
+        yumrepo { 'euca_epel':
+          ensure       => $_epel_repo_ensure,
+          descr        => 'epel',
+          enabled      => '1',
+          enablegroups => '0',
+          gpgcheck     => '1',
+          gpgkey       => 'http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-6',
+          mirrorlist   => 'https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch',
+        }
+        file {'/etc/yum.repos.d/euca_epel.repo':
+          ensure => $_epel_repo_ensure,
+        }
+      }#rhel case
+      default : {
+        fail("${::operatingsystem} is not a supported operating system")
+      }#default case
 
-class eucalyptus::extrarepo {
-  case $operatingsystem  {
-    centos, redhat : {
-      # Install other repository required for Eucalyptus
-      # Eucalyptus is keeping a copy of their repository RPM
-      # So we can install their repo package directly from Eucalyptus repo
-      $repo_packages = ['elrepo-release', 'epel-release']
-        package { $repo_packages:
-          ensure  => latest,
-          require => Class[eucalyptus::repo],
-      }
-    }
-  }
+    }#operatingsystem case
+  }#manage_repos true
 }
