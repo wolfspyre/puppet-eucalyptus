@@ -13,8 +13,9 @@
 #
 class eucalyptus
 {
+
   stage { 'before': before => Stage['main'] }
-  class {['eucalyptus::repo', 'eucalyptus::extrarepo', 'eucalyptus::security']:
+  class {['eucalyptus::repo', 'eucalyptus::security']:
     stage => before,
   }
 }
