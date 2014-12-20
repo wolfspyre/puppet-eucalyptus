@@ -2,9 +2,8 @@
 require 'spec_helper'
 require 'pry'
 
-describe 'eucalyptus::cc::install', :type => :class do
+describe 'eucalyptus::clc', :type => :class do
   context 'input validation' do
-    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
 
 #    ['path'].each do |paths|
 #      context "when the #{paths} parameter is not an absolute path" do
@@ -60,14 +59,14 @@ describe 'eucalyptus::cc::install', :type => :class do
 #      end
 #     end#regexes
 
-#    ['string'].each do |strings|
-#      context "when the #{strings} parameter is not a string" do
-#        let (:params) {{strings => false }}
-#        it 'should fail' do
-#          expect { subject }.to raise_error(Puppet::Error, /false is not a string./)
-#        end
-#      end
-#    end#strings
+    ['cloud_name'].each do |strings|
+      context "when the #{strings} parameter is not a string" do
+        let (:params) {{strings => false }}
+        it 'should fail' do
+          expect { subject }.to raise_error(Puppet::Error, /false is not a string./)
+        end
+      end
+    end#strings
 
 #    ['opt_strings'].each do |optional_strings|
 #      context "when the optional parameter #{optional_strings} has a value, but it is not a string" do
@@ -79,18 +78,17 @@ describe 'eucalyptus::cc::install', :type => :class do
 #    end#opt_strings
 
   end#input validation
-  context "When on a RedHat-esque system" do
+  context "When on a RedHat system" do
     let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
     context 'when fed no parameters' do
-      it do
-        should contain_package('eucalyptus-cc').with({
-          :ensure=>"present"
-        })
-        should contain_service('eucalyptus-cc').with({
-          :ensure=>"running",
-          :enable=>true
-        })
-      end
+      it {
+        should contain_class('eucalyptus')
+        should contain_class('eucalyptus::conf')
+        should contain_class('eucalyptus::clc')
+        should contain_class('eucalyptus::clc::install')
+        should contain_class('eucalyptus::clc::config')
+        should contain_class('eucalyptus::clc::reg')
+      }
     end#no params
   end
 end

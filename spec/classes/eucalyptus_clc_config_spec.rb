@@ -2,9 +2,8 @@
 require 'spec_helper'
 require 'pry'
 
-describe 'eucalyptus::cc::install', :type => :class do
+describe 'eucalyptus::clc::config', :type => :class do
   context 'input validation' do
-    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
 
 #    ['path'].each do |paths|
 #      context "when the #{paths} parameter is not an absolute path" do
@@ -79,18 +78,16 @@ describe 'eucalyptus::cc::install', :type => :class do
 #    end#opt_strings
 
   end#input validation
-  context "When on a RedHat-esque system" do
+  context "When on a Redhat system" do
     let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
     context 'when fed no parameters' do
-      it do
-        should contain_package('eucalyptus-cc').with({
-          :ensure=>"present"
-        })
-        should contain_service('eucalyptus-cc').with({
-          :ensure=>"running",
-          :enable=>true
-        })
-      end
-    end#no params
+      it {
+        should contain_exec('init-clc').with({
+          :command=>"/usr/sbin/euca_conf --initialize",
+          :creates=>"/var/lib/eucalyptus/db/data",
+          :timeout=>"0"
+        }).that_comes_before('Service[eucalyptus-cloud]')
+      }
+    end
   end
 end

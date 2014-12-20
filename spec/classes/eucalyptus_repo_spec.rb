@@ -4,6 +4,7 @@ require 'pry'
 
 describe 'eucalyptus::repo', :type => :class do
   context 'input validation' do
+    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
 
 #    ['path'].each do |paths|
 #      context "when the #{paths} parameter is not an absolute path" do
