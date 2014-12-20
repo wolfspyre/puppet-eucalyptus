@@ -67,13 +67,22 @@ The **eucalyptus::cc::install** class is responsible for installing the `eucalyp
 
 The **eucalyptus::cc::reg** class is responsible for exporting a resource by which nodes can register the cc component
 
+The **eucalyptus::clc** class is responsible for the installation, configuration, and enablement of the CLC packages and services.
+
+The **eucalyptus::clc::config** class is responsible for initializing euca_conf, and exporting the virtual resources for `/var/lib/eucalyptus/keys/cloud-cert.pem`, `/var/lib/eucalyptus/keys/cloud-pk.pem`, and `/var/lib/eucalyptus/keys/euca.p12` as well as exporting the specific cloud's .p12 file
+
+The **eucalyptus::clc::install** class is responsible for the installation and enablement of the `eucalyptus-cloud` package and service
+
+The **eucalyptus::clc::reg** class is responsible for
+
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
 ###Hiera Example
 
 ```
-eucalyptus::cc::cloud_name: 'cloud1'
-eucalyptus::cc:cluster_name: 'cluster1'
+eucalyptus::cc::cloud_name:   'cloud1'
+eucalyptus::cc::cluster_name: 'cluster1'
+eucalyptus::clc::cloud_name:  'cloud1'
 eucalyptus::repo::epel_repo_enable:      true
 eucalyptus::repo::euca2ools_repo_enable: true
 eucalyptus::repo::euca_repo_enable:      true
@@ -99,6 +108,10 @@ This param is a boolean
 
 	-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
 	-	**cluster_name** *string* Default: *cluster1* `The name of the cluster.`
+
+-	**eucalyptus::clc** Class
+
+	-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
 
 -	**eucalyptus::repo** Class
 
