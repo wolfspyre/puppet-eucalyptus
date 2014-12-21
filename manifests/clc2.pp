@@ -1,4 +1,6 @@
-class eucalyptus::clc2 ($cloud_name = "cloud1") {
+class eucalyptus::clc2 (
+  $cloud_name = 'cloud1'
+) {
   include eucalyptus
   include eucalyptus::conf
   Class['eucalyptus'] ->
@@ -11,7 +13,7 @@ class eucalyptus::clc2 ($cloud_name = "cloud1") {
           Service['eucalyptus-cloud']
   $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
   $host       = getvar("ipaddress_${registerif}")
-  include eucalyptus::clc2::install
+  include eucalyptus::clc::install
   include eucalyptus::clc2::config
   include eucalyptus::clc2::reg
 }

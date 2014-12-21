@@ -1,4 +1,5 @@
-#eucalyptus
+Eucalyptus
+==========
 
 ####Table of Contents
 
@@ -59,7 +60,9 @@ Classes, types, and resources for customizing, configuring, and doing the fancy 
 
 The **eucalyptus** class does ...
 
-The **eucalyptus::cc** class is responsible for the installation, configuration, and enablement of the CC packages and services.
+The **eucalyptus::arbitrator** defined type creates an exec which uses `euca-register-arbitrator` to register an arbitrator host which the eucalyptus host pings to evaluate whether or not it can talk to "the outside world". It additionally generates an `eucalyptus::cloud_properties` resource for the `arbitrator_gateway_${partition_name}` **It looks like this should change to use euca_conf** See [this link](https://www.eucalyptus.com/docs/eucalyptus/4.0.2/install-guide/registering_arbitrator.html)
+
+The **eucalyptus::cc** class is responsible for the installation, configuration, and enablement of the CC packages and services. It generates the `$registerif` variable via a regex of the `$eucalyptus::conf::vnet_pubinterface` variable, and sets the `$host` variable from the `ipaddress_${registerif}` variable.
 
 The **eucalyptus::cc::config** class is responsible for exporting the certificate files amongst services
 
@@ -69,11 +72,19 @@ The **eucalyptus::cc::reg** class is responsible for exporting a resource by whi
 
 The **eucalyptus::clc** class is responsible for the installation, configuration, and enablement of the CLC packages and services.
 
-The **eucalyptus::clc::config** class is responsible for initializing euca_conf, and exporting the virtual resources for `/var/lib/eucalyptus/keys/cloud-cert.pem`, `/var/lib/eucalyptus/keys/cloud-pk.pem`, and `/var/lib/eucalyptus/keys/euca.p12` as well as exporting the specific cloud's .p12 file
+The **eucalyptus::clc2** class is responsible for the installation, configuration, and enablement of the CLC packages and services. This is to allow for an HA CLC configuration. It generates the `$registerif` variable via a regex of the `$eucalyptus::conf::vnet_pubinterface` variable, and sets the `$host` variable from the `ipaddress_${registerif}` variable.
+
+The **eucalyptus::clc::config** class is responsible for initializing euca_conf, and exporting the file resources for `/var/lib/eucalyptus/keys/cloud-cert.pem`, `/var/lib/eucalyptus/keys/cloud-pk.pem`, and `/var/lib/eucalyptus/keys/euca.p12` as well as exporting an exec which generates the specific cloud's .p12 file. This seems to be to circumvent [this bug](http://projects.puppetlabs.com/issues/17216), which was fixed some time ago.
+
+The **eucalyptus::clc2::config** class is responsible for collecting the `/var/lib/eucalyptus/keys/cloud-cert.pem`, `/var/lib/eucalyptus/keys/cloud-pk.pem`, and `/var/lib/eucalyptus/keys/euca.p12` file resources, as well as the exec which generates the specific cloud's .p12 file. This seems to be to circumvent [this bug](http://projects.puppetlabs.com/issues/17216), which was fixed some time ago.
 
 The **eucalyptus::clc::install** class is responsible for the installation and enablement of the `eucalyptus-cloud` package and service
 
-The **eucalyptus::clc::reg** class is responsible for
+The **eucalyptus::clc::reg** class is responsible for collecting any exported exec's tagged with the `$cloud_name`. If the `eucalyptus::walrus::reg` class is included on this node, it must land before these resources.
+
+The **eucalyptus::clc2::reg** class is responsible for exporting the `reg_clc_${::hostname}` exec tagged with the `$cloud_name`.
+
+The **eucalyptus::cloud_properties** defined type is responsible for calling `euca-modify-property` to generate properties with specific values, unless `euca-describe-properties` lists the properties with the specific values. It is intended to configure the CLC without restarting services.
 
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
@@ -83,6 +94,7 @@ The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to
 eucalyptus::cc::cloud_name:   'cloud1'
 eucalyptus::cc::cluster_name: 'cluster1'
 eucalyptus::clc::cloud_name:  'cloud1'
+eucalyptus::clc2::cloud_name:  'cloud1'
 eucalyptus::repo::epel_repo_enable:      true
 eucalyptus::repo::euca2ools_repo_enable: true
 eucalyptus::repo::euca_repo_enable:      true
@@ -112,6 +124,20 @@ This param is a boolean
 -	**eucalyptus::clc** Class
 
 	-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
+
+-	**eucalyptus::clc2** Class
+
+-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
+
+-	**eucalyptus::cloud_properties** Defined Type
+
+-	**property_name** *string* `The name of the property to set`
+
+-	**property_value** *string* `The value the property should have`
+
+-	**tries** *string* Default: *3* `This is passed to the exec resource`
+
+-	**try_sleep** *string* Default: *2* `This is passed to the exec resource`
 
 -	**eucalyptus::repo** Class
 
