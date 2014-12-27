@@ -32,8 +32,12 @@ Things to change from 3.x for 4.0
 
 -	**Directories:**
 	-	/var/lib/eucalyptus
--	**Files:** `templatized files are displayed like this`
-	-	/home/eucalyptus/setup.sh
+-	**Files:**`templatized files are displayed like this` *exported files are displayed lile this*
+	-	*/var/lib/eucalyptus/keys/node-cert.pem* exported by the **eucalyptus::cluster** defined type
+	-	*/var/lib/eucalyptus/keys/node-pk.pem* exported by the **eucalyptus::cluster** defined type
+	-	*/var/lib/eucalyptus/keys/cluster-cert.pem* exported by the **eucalyptus::cluster** defined type
+	-	*/var/lib/eucalyptus/keys/cluster-pk.pem* exported by the **eucalyptus::cluster** defined type
+	-	*/var/lib/eucalyptus/keys/vtunpass*
 	-	`/home/eucalyptus/config.py`
 -	**Cron Jobs**
 -	**Logs being rotated**
@@ -86,15 +90,61 @@ The **eucalyptus::clc2::reg** class is responsible for exporting the `reg_clc_${
 
 The **eucalyptus::cloud_properties** defined type is responsible for calling `euca-modify-property` to generate properties with specific values, unless `euca-describe-properties` lists the properties with the specific values. It is intended to configure the CLC without restarting services.
 
+The **eucalyptus::cluster** defined type is responsible for informing the CLC about clusters. it consumes the parameters *cloud_name* and *cluster_name* and subsequently exports the following files:
+
+-	*/var/lib/eucalyptus/keys/node-cert.pem*
+-	*/var/lib/eucalyptus/keys/node-pk.pem*
+-	*/var/lib/eucalyptus/keys/cluster-cert.pem*
+-	*/var/lib/eucalyptus/keys/cluster-pk.pem*
+
+	These files are used by the`eucakeys` custom facts to make the keys available to other manifests.
+
+The **eucalyptus::conf** class is the databinding entrypoint into the `eucalyptus_config` resource. It consumes a collection of parameters and in turn creates a virtual `eucalyptus_config` resource that is consumed by **populate_this**
+
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
 ###Hiera Example
 
 ```
+## eucalyptus::cc ##############################################################
 eucalyptus::cc::cloud_name:   'cloud1'
 eucalyptus::cc::cluster_name: 'cluster1'
-eucalyptus::clc::cloud_name:  'cloud1'
-eucalyptus::clc2::cloud_name:  'cloud1'
+## eucalyptus::clc #############################################################
+eucalyptus::clc::cloud_name: 'cloud1'
+## eucalyptus::clc2 ############################################################
+eucalyptus::clc2::cloud_name: 'cloud1'
+## eucalyptus::conf ############################################################
+eucalyptus::conf::cc_arbitrators:         'none'
+eucalyptus::conf::cc_port:                '8774'
+eucalyptus::conf::cloud_opts:             ''
+eucalyptus::conf::disable_dns:            'Y'
+eucalyptus::conf::disable_iscsi:          'N'
+eucalyptus::conf::enable_ws_security:     'Y'
+eucalyptus::conf::eucalyptus_dir:         '/'
+eucalyptus::conf::eucalyptus_loglevel:    'DEBUG'
+eucalyptus::conf::eucalyptus_user:        'eucalyptus'
+eucalyptus::conf::hypervisor:             'kvm'
+eucalyptus::conf::instance_path:          '/var/lib/eucalyptus/instances'
+eucalyptus::conf::nc_port:                '8775'
+eucalyptus::conf::nc_service:             'axis2/services/EucalyptusNC'
+eucalyptus::conf::power_idlethresh:       '0'
+eucalyptus::conf::power_wakethresh:       '0'
+eucalyptus::conf::schedpolicy:            'ROUNDROBIN'
+eucalyptus::conf::use_virtio_disk:        '1'
+eucalyptus::conf::use_virtio_net:         '0'
+eucalyptus::conf::use_virtio_root:        '1'
+eucalyptus::conf::vnet_addrspernet:       '32'
+eucalyptus::conf::vnet_bridge:            'br0'
+eucalyptus::conf::vnet_dhcpdaemon:        '/usr/sbin/dhcpd41'
+eucalyptus::conf::vnet_disable_tunneling: 'y'
+eucalyptus::conf::vnet_dns:               '8.8.8.8'
+eucalyptus::conf::vnet_mode:              'SYSTEM'
+eucalyptus::conf::vnet_netmask:           '255.255.255.0'
+eucalyptus::conf::vnet_privinterface:     'eth1'
+eucalyptus::conf::vnet_pubinterface:      'eth0'
+eucalyptus::conf::vnet_publicips:         '192.168.0.50-192.168.0.250'
+eucalyptus::conf::vnet_subnet:            '127.0.0.1'
+## eucalyptus::repo ############################################################
 eucalyptus::repo::epel_repo_enable:      true
 eucalyptus::repo::euca2ools_repo_enable: true
 eucalyptus::repo::euca_repo_enable:      true
@@ -127,17 +177,23 @@ This param is a boolean
 
 -	**eucalyptus::clc2** Class
 
--	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
+	-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
 
 -	**eucalyptus::cloud_properties** Defined Type
 
--	**property_name** *string* `The name of the property to set`
+	-	**property_name** *string* `The name of the property to set`
 
--	**property_value** *string* `The value the property should have`
+	-	**property_value** *string* `The value the property should have`
 
--	**tries** *string* Default: *3* `This is passed to the exec resource`
+	-	**tries** *string* Default: *3* `This is passed to the exec resource`
 
--	**try_sleep** *string* Default: *2* `This is passed to the exec resource`
+	-	**try_sleep** *string* Default: *2* `This is passed to the exec resource`
+
+-	**eucalyptus::cluster** Defined type
+
+-	**cloud_name** *string* `The name of the cloud.`
+
+-	**cluster_name** *string* `The name of the cluster.`
 
 -	**eucalyptus::repo** Class
 

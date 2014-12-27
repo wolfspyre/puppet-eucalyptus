@@ -5,6 +5,10 @@ define eucalyptus::cluster (
   $cloud_name,
   $cluster_name
 ) {
+  validate_string(
+    $cloud_name,
+    $cluster_name,
+  )
   # One of these for each cluster
   $node_cert = getvar("eucakeys_${cluster_name}_node_cert")
   @@file { "${cloud_name}_${cluster_name}_node_cert":
