@@ -43,6 +43,8 @@ Things to change from 3.x for 4.0
 -	**Logs being rotated**
 -	**Packages:**
 	-	eucalyptus-cc
+	-	drbd83-utils **drbd_config**
+	-	kmod-drbd83 **drbd_config**
 -	**Services**
 	-	eucalyptus-cc
 
@@ -100,6 +102,8 @@ The **eucalyptus::cluster** defined type is responsible for informing the CLC ab
 	These files are used by the`eucakeys` custom facts to make the keys available to other manifests.
 
 The **eucalyptus::conf** class is the databinding entrypoint into the `eucalyptus_config` resource. It consumes a collection of parameters and in turn creates a virtual `eucalyptus_config` resource that is consumed by **populate_this**
+
+The **eucalyptus::drbd_config** class is used to install the required packages to configure drbd for walrus. It ensures the *drbd83-utils* and *kmod-drbd83* packages are installed. It also utilizes the **file_line** resource to add a line to `/etc/drbd.conf` file which includes */etc/eucalyptus/drbd.conf*. It also utilizes the **eucalyptus::kern_module** defined type to enable the kernel module.**It should be noted that the inclusion of this class alone is NOT sufficient to enable drbd properly**. In addition to inclusiuon of this class, you must also have the **eucalyptus::conf** class's *cloud_opts* param have at least the following value: `'-Dwalrus.storage.manager=DRBDStorageManager'`
 
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 

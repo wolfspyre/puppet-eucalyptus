@@ -13,7 +13,7 @@
 # Tom Ellis <tom.ellis@eucalyptus.com\>
 # Original author: http://projects.puppetlabs.com/projects/1/wiki/Kernel_Modules_Patterns
 
-define kern_module ($ensure) {
+define eucalyptus::kern_module ($ensure) {
     case $ensure {
         present: {
             exec { "insert_module_${name}":
