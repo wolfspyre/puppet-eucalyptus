@@ -1,6 +1,8 @@
 Eucalyptus
 ==========
 
+[![Build Status](https://travis-ci.org/wolfspyre/puppet-eucalyptus.svg)](https://travis-ci.org/wolfspyre/puppet-eucalyptus)
+
 ####Table of Contents
 
 1.	[Overview](#overview)
