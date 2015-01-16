@@ -105,6 +105,8 @@ The **eucalyptus::conf** class is the databinding entrypoint into the `eucalyptu
 
 The **eucalyptus::drbd_config** class is used to install the required packages to configure drbd for walrus. It ensures the *drbd83-utils* and *kmod-drbd83* packages are installed. It also utilizes the **file_line** resource to add a line to `/etc/drbd.conf` file which includes */etc/eucalyptus/drbd.conf*. It also utilizes the **eucalyptus::kern_module** defined type to enable the kernel module.**It should be noted that the inclusion of this class alone is NOT sufficient to enable drbd properly**. In addition to inclusiuon of this class, you must also have the **eucalyptus::conf** class's *cloud_opts* param have at least the following value: `'-Dwalrus.storage.manager=DRBDStorageManager'`
 
+The **eucalyptus::drbd_resource** defined type is used in conjunction with Eucalyptus Walrus HA. It should only be declared on walrus hosts. It is responsible for initialization and enablement of the drbd synchronized block device for the primary/secondary walrus hosts. It should not be added to any other nodes. Note that using this resource solely is not sufficient to enable drbd properly for use with Eucalyptus. In addition to enabling the **eucalyptus::drbd_config** class on the walrus hosts, more stuff here. when these resources are associated with either walrus host a file resource is created for `/etc/eucalyptus/drbd.conf`, and two exec resources manage the creation and enablement of the desired drbd resource.
+
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
 ###Hiera Example
@@ -199,6 +201,18 @@ This param is a boolean
 
 -	**cluster_name** *string* `The name of the cluster.`
 
+**eucalyptus::drbd_resource** Defined Type
+
+-	**host1** *string* `the fqdn of the primary walrus host`
+-	**host2** *string* `the fqdn of the secondary walrus host`
+-	**ip1** *string* `the ipaddress of the primary walrus host`
+-	**ip2** *string* `the ipaddress of the secondary walrus host`
+-	**disk_host1** *absolute path* `the block device to use for walrus on host1`
+-	**disk_host2** *absolute path* `the block device to use for walrus on host2`
+-	**port** *string* Default: *7789* `the port drbd uses?`
+-	**rate** *string* Default: *40M* `The rate at which to copy?`
+-	**manage** *boolean* Default: *true* `whether or not to manage ____`**device** *string* Default: */dev/drbd1* `The block device drbd will use`
+
 -	**eucalyptus::repo** Class
 
 	-	**epel_repo_enable** *boolean* Default: *true* `Whether or not to enable the epel repo via the eucalyptus module.`
@@ -208,7 +222,48 @@ This param is a boolean
 
 ##Reference
 
-##Limitations
+###Using the eucalyptus drbd resources Define the resource in your node definition for your walrus server:
+
+```
+eucalyptus::drbd_resource { 'r0':
+  host1      => 'walrus1.example.com',
+  host2      => 'walrus2.example.com',
+  ip1        => '192.168.0.1',
+  ip2        => '192.168.0.2',
+  disk_host1 => '/dev/sda4',
+  disk_host2 => '/dev/sda4',
+}
+```
+
+Update properties in CLC node definition:
+
+```
+eucalyptus::cloud_properties { 'walrus blockdevice':
+  property_name  => 'walrus.blockdevice',
+  property_value => '/dev/drbd1',
+}
+eucalyptus::cloud_properties { 'walrus resource':
+  property_name  => 'walrus.resource',
+  property_value => 'r0'
+}
+```
+
+== Notes You must still run the following manually:* Synchronize DRBD volumes* Increase sync speed whilst doing initial sync* Format the device
+
+Use commands similar to these on the primary walrus to accomplish that:
+
+```
+    drbdsetup /dev/drbd1 syncer -r 110M
+    drbdadm -- --overwrite-data-of-peer primary r0 mkfs.ext4 /dev/$device
+```
+
+You can avoid doing a full sync in dev/test by running:
+
+```
+    drbdadm -- --clear-bitmap new-current-uuid r0
+    drbdadm primary r0
+    mkfs.ext4 /dev/$device ##Limitations
+```
 
 OS compatibility, version compatibility, etc.
 
