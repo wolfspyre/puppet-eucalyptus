@@ -35,6 +35,7 @@ Things to change from 3.x for 4.0
 -	**Directories:**
 	-	/var/lib/eucalyptus
 -	**Files:**`templatized files are displayed like this` *exported files are displayed lile this*
+	-	`/etc/eucalyptus/drbd.conf` created by the **eucalyptus::drbd_resource** defined type and **eucalyptus::drbd_config** class.
 	-	*/var/lib/eucalyptus/keys/node-cert.pem* exported by the **eucalyptus::cluster** defined type
 	-	*/var/lib/eucalyptus/keys/node-pk.pem* exported by the **eucalyptus::cluster** defined type
 	-	*/var/lib/eucalyptus/keys/cluster-cert.pem* exported by the **eucalyptus::cluster** defined type
