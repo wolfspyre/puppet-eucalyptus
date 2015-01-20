@@ -50,6 +50,7 @@ Things to change from 3.x for 4.0
 	-	kmod-drbd83 **drbd_config**
 -	**Services**
 	-	eucalyptus-cc
+	-	eucalyptus-cloud **eucalyptus::jvm**
 
 ###Setup Requirements
 
@@ -67,7 +68,7 @@ Things to change from 3.x for 4.0
 
 Classes, types, and resources for customizing, configuring, and doing the fancy stuff with your module.
 
-The **eucalyptus** class creates the 'before' stage which is used to order the **eucalyptus::repo** and **eucalyptus::security** classes before any other.
+The **eucalyptus** class creates the 'before' stage which is used to order the **eucalyptus::repo** and **eucalyptus::security** classes before any other. It also instantiates them explicitly. This may not be the best behavior.
 
 The **eucalyptus::arbitrator** defined type creates an exec which uses `euca-register-arbitrator` to register an arbitrator host which the eucalyptus host pings to evaluate whether or not it can talk to "the outside world". It additionally generates an `eucalyptus::cloud_properties` resource for the `arbitrator_gateway_${partition_name}` **It looks like this should change to use euca_conf** See [this link](https://www.eucalyptus.com/docs/eucalyptus/4.0.2/install-guide/registering_arbitrator.html)
 
@@ -109,6 +110,8 @@ The **eucalyptus::conf** class is the databinding entrypoint into the `eucalyptu
 The **eucalyptus::drbd_config** class is used to install the required packages to configure drbd for walrus. It ensures the *drbd83-utils* and *kmod-drbd83* packages are installed. It also utilizes the **file_line** resource to add a line to `/etc/drbd.conf` file which includes */etc/eucalyptus/drbd.conf*. It also utilizes the **eucalyptus::kern_module** defined type to enable the kernel module.**It should be noted that the inclusion of this class alone is NOT sufficient to enable drbd properly**. In addition to inclusiuon of this class, you must also have the **eucalyptus::conf** class's *cloud_opts* param have at least the following value: `'-Dwalrus.storage.manager=DRBDStorageManager'`
 
 The **eucalyptus::drbd_resource** defined type is used in conjunction with Eucalyptus Walrus HA. It should only be declared on walrus hosts. It is responsible for initialization and enablement of the drbd synchronized block device for the primary/secondary walrus hosts. It should not be added to any other nodes. Note that using this resource solely is not sufficient to enable drbd properly for use with Eucalyptus. In addition to enabling the **eucalyptus::drbd_config** class on the walrus hosts, more stuff here. when these resources are associated with either walrus host a file resource is created for `/etc/eucalyptus/drbd.conf`, and two exec resources manage the creation and enablement of the desired drbd resource.
+
+The **eucalyptus::jvm** class instantiates the `eucalyptus-cloud` service and ensures it's enabled and running.
 
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
