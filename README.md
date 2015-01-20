@@ -67,7 +67,7 @@ Things to change from 3.x for 4.0
 
 Classes, types, and resources for customizing, configuring, and doing the fancy stuff with your module.
 
-The **eucalyptus** class does ...
+The **eucalyptus** class creates the 'before' stage which is used to order the **eucalyptus::repo** and **eucalyptus::security** classes before any other.
 
 The **eucalyptus::arbitrator** defined type creates an exec which uses `euca-register-arbitrator` to register an arbitrator host which the eucalyptus host pings to evaluate whether or not it can talk to "the outside world". It additionally generates an `eucalyptus::cloud_properties` resource for the `arbitrator_gateway_${partition_name}` **It looks like this should change to use euca_conf** See [this link](https://www.eucalyptus.com/docs/eucalyptus/4.0.2/install-guide/registering_arbitrator.html)
 
