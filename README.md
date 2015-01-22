@@ -113,6 +113,8 @@ The **eucalyptus::drbd_resource** defined type is used in conjunction with Eucal
 
 The **eucalyptus::jvm** class instantiates the `eucalyptus-cloud` service and ensures it's enabled and running.
 
+The **eucalyptus::kern_module** defined type fires `/sbin/modprobe` to insert or remove the specified kernel module via an exec depending on the value of the ensure parameter. It is arguable if this should be handled by the eucalyptus module or if a suitable upstream replacement module should be recommended and demonstrated so as to take advantage of community modules.
+
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
 ###Hiera Example
@@ -165,12 +167,7 @@ eucalyptus::repo::manage_repos:          true
 
 ###Parameters
 
--	**eucalyptus** Class
-	-	**param1** *string*
-
-This param controls.. what? * **param2** *boolean*
-
-This param is a boolean
+-	**eucalyptus** Class Has no parameters
 
 -	**eucalyptus::arbitrator** Defined Type
 
@@ -218,6 +215,10 @@ This param is a boolean
 -	**port** *string* Default: *7789* `the port drbd uses?`
 -	**rate** *string* Default: *40M* `The rate at which to copy?`
 -	**manage** *boolean* Default: *true* `whether or not to manage ____`**device** *string* Default: */dev/drbd1* `The block device drbd will use`
+
+**eucalyptus::kern_module** Defined Type
+
+-	**ensure** *string* Valid values: `present`, `absent`. `whether to insert or remove the specified kernel module via an exec firing modprobe`
 
 -	**eucalyptus::repo** Class
 
