@@ -45,11 +45,13 @@ Things to change from 3.x for 4.0
 -	**Cron Jobs**
 -	**Logs being rotated**
 -	**Packages:**
-	-	eucalyptus-cc
+	-	eucalyptus-cc **eucalyptus::cc**
+	-	eucalyptus-nc **eucalyptus::nc**
 	-	drbd83-utils **drbd_config**
 	-	kmod-drbd83 **drbd_config**
 -	**Services**
-	-	eucalyptus-cc
+	-	eucalyptus-cc **eucalyptus::cc**
+	-	eucalyptus-nc **eucalyptus::nc**
 	-	eucalyptus-cloud **eucalyptus::jvm**
 
 ###Setup Requirements
@@ -115,6 +117,14 @@ The **eucalyptus::jvm** class instantiates the `eucalyptus-cloud` service and en
 
 The **eucalyptus::kern_module** defined type fires `/sbin/modprobe` to insert or remove the specified kernel module via an exec depending on the value of the ensure parameter. It is arguable if this should be handled by the eucalyptus module or if a suitable upstream replacement module should be recommended and demonstrated so as to take advantage of community modules.
 
+The **eucalyptus::nc** class is responsible for the installation, configuration, ordering, and enablement of the NC packages and services. It generates the `$registerif` variable via a regex of the `$eucalyptus::conf::vnet_pubinterface` variable, and sets the `$host` variable from the `ipaddress_${registerif}` variable.
+
+The **eucalyptus::nc::config** class is responsible for realizing the certificate files exported from the `eucalyptus::clc::config` services
+
+The **eucalyptus::nc::install** class is responsible for installing the `eucalyptus-nc` package, and enabling the `eucalyptus-nc` service.
+
+The **eucalyptus::nc::reg** class is responsible for realizing the `eucalyptus_config` resource. exporting an exec resource by which nodes can register the nc component. It runs `/usr/sbin/euca_conf` with the necessary flags to register the node, unless the *$host* resource is found in `/etc/eucalyptus/eucalyptus.conf`
+
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
 ###Hiera Example
@@ -158,6 +168,9 @@ eucalyptus::conf::vnet_privinterface:     'eth1'
 eucalyptus::conf::vnet_pubinterface:      'eth0'
 eucalyptus::conf::vnet_publicips:         '192.168.0.50-192.168.0.250'
 eucalyptus::conf::vnet_subnet:            '127.0.0.1'
+## eucalyptus::nc ##############################################################
+eucalyptus::nc::cloud_name:   'cloud1'
+eucalyptus::nc::cluster_name: 'cluster1'
 ## eucalyptus::repo ############################################################
 eucalyptus::repo::epel_repo_enable:      true
 eucalyptus::repo::euca2ools_repo_enable: true
@@ -191,34 +204,36 @@ eucalyptus::repo::manage_repos:          true
 -	**eucalyptus::cloud_properties** Defined Type
 
 	-	**property_name** *string* `The name of the property to set`
-
 	-	**property_value** *string* `The value the property should have`
-
 	-	**tries** *string* Default: *3* `This is passed to the exec resource`
-
 	-	**try_sleep** *string* Default: *2* `This is passed to the exec resource`
 
 -	**eucalyptus::cluster** Defined type
 
--	**cloud_name** *string* `The name of the cloud.`
+	-	**cloud_name** *string* `The name of the cloud.`
+	-	**cluster_name** *string* `The name of the cluster.`
 
--	**cluster_name** *string* `The name of the cluster.`
+-	**eucalyptus::drbd_resource** Defined Type
 
-**eucalyptus::drbd_resource** Defined Type
+	-	**host1** *string* `the fqdn of the primary walrus host`
+	-	**host2** *string* `the fqdn of the secondary walrus host`
+	-	**ip1** *string* `the ipaddress of the primary walrus host`
+	-	**ip2** *string* `the ipaddress of the secondary walrus host`
+	-	**disk_host1** *absolute path* `the block device to use for walrus on host1`
+	-	**disk_host2** *absolute path* `the block device to use for walrus on host2`
+	-	**port** *string* Default: *7789* `the port drbd uses?`
+	-	**rate** *string* Default: *40M* `The rate at which to copy?`
+	-	**manage** *boolean* Default: *true* `whether or not to manage ____`
+	-	**device** *string* Default: */dev/drbd1* `The block device drbd will use`
 
--	**host1** *string* `the fqdn of the primary walrus host`
--	**host2** *string* `the fqdn of the secondary walrus host`
--	**ip1** *string* `the ipaddress of the primary walrus host`
--	**ip2** *string* `the ipaddress of the secondary walrus host`
--	**disk_host1** *absolute path* `the block device to use for walrus on host1`
--	**disk_host2** *absolute path* `the block device to use for walrus on host2`
--	**port** *string* Default: *7789* `the port drbd uses?`
--	**rate** *string* Default: *40M* `The rate at which to copy?`
--	**manage** *boolean* Default: *true* `whether or not to manage ____`**device** *string* Default: */dev/drbd1* `The block device drbd will use`
+-	**eucalyptus::kern_module** Defined Type
 
-**eucalyptus::kern_module** Defined Type
+	-	**ensure** *string* Valid values: `present`, `absent`. `whether to insert or remove the specified kernel module via an exec firing modprobe`
 
--	**ensure** *string* Valid values: `present`, `absent`. `whether to insert or remove the specified kernel module via an exec firing modprobe`
+-	**eucalyptus::nc** Class
+
+	-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
+	-	**cluster_name** *string* Default: *cluster1* `The name of the cluster.`
 
 -	**eucalyptus::repo** Class
 
