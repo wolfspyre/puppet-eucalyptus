@@ -79,7 +79,10 @@ describe 'eucalyptus::clc::config', :type => :class do
 
   end#input validation
   context "When on a Redhat system" do
-    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
+
+    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat', 'hostname' => 'euca_cc_01', 'ipaddress_eth0' => '10.0.0.1'}}
+    let(:pre_condition) { ['Exec<||>', 'eucalyptus::cluster{"mycluster": cloud_name => "cloud1", cluster_name => "cluster1"}' ] }
+    #TODO: add testing of custom eucakeys facts presence to validate the exporting of the keys
     context 'when fed no parameters' do
       it {
         should contain_exec('init-clc').with({

@@ -4,6 +4,8 @@ class eucalyptus::clc::config inherits eucalyptus::clc {
   Exec['init-clc'] ->
   Service['eucalyptus-cloud'] ->
   Class[eucalyptus::clc::reg]
+  $host         = $eucalyptus::clc::host
+  $cloud_name   = $eucalyptus::clc::cloud_name
   # initializes some keys as well as the db
   exec { 'init-clc':
     command => '/usr/sbin/euca_conf --initialize',
@@ -47,10 +49,10 @@ class eucalyptus::clc::config inherits eucalyptus::clc {
     # This is a hack to fix issues with shipping binary files with puppet
     # Its required both post puppetdb and ruby 1.9
     @@exec { "${cloud_name}_euca.p12":
-      command   => "/bin/echo \'${::eucakeys_euca_p12}\' | \
+      command => "/bin/echo \'${::eucakeys_euca_p12}\' | \
       /usr/bin/openssl base64 -d > /var/lib/eucalyptus/keys/euca.p12",
-      unless    => '/usr/bin/test -s /var/lib/eucalyptus/keys/euca.p12',
-      tag       => "${cloud_name}_euca.p12",
+      unless  => '/usr/bin/test -s /var/lib/eucalyptus/keys/euca.p12',
+      tag     => "${cloud_name}_euca.p12",
     }
   }
 }

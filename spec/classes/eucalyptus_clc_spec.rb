@@ -79,7 +79,7 @@ describe 'eucalyptus::clc', :type => :class do
 
   end#input validation
   context "When on a RedHat system" do
-    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
+    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat', 'hostname' => 'euca_clc_01', 'ipaddress_eth0' => '10.0.0.1'}}
     context 'when fed no parameters' do
       it {
         should contain_class('eucalyptus')
@@ -88,6 +88,7 @@ describe 'eucalyptus::clc', :type => :class do
         should contain_class('eucalyptus::clc::install')
         should contain_class('eucalyptus::clc::config')
         should contain_class('eucalyptus::clc::reg')
+#        binding.pry;
       }
     end#no params
   end

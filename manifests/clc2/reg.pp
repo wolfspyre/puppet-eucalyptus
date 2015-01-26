@@ -1,4 +1,6 @@
 class eucalyptus::clc2::reg inherits eucalyptus::clc2 {
+  $host       = $eucalyptus::clc2::host
+  $cloud_name = $eucalyptus::clc2::cloud_name
   @@exec { "reg_clc_${::hostname}":
     command => "/usr/sbin/euca_conf \
     --no-rsync \

@@ -79,8 +79,11 @@ describe 'eucalyptus::clc::reg', :type => :class do
 
   end#input validation
   context "When on a RedHat system" do
-    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat'}}
+    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat', 'hostname' => 'euca_clc_01', 'ipaddress_eth0' => '10.0.0.1'}}
+    let(:pre_condition) { ['Exec<||>', 'eucalyptus::cluster{"mycluster": cloud_name => "cloud1", cluster_name => "cluster1"}' ] }
     it do
+      #TODO: simulate different example exported execs to validate their realization
+      #binding.pry;
     end
   end
 end
