@@ -79,7 +79,7 @@ describe 'eucalyptus::cc', :type => :class do
 
   end#input validation
   context "When on a RHEL system" do
-    let (:facts) {{'osfamily' => 'RedHat','operatingsystem' => 'RedHat'}}
+    let (:facts) {{'osfamily' => 'RedHat','operatingsystem' => 'RedHat', 'hostname' => 'euca_cc_01', 'ipaddress_eth0' => '10.0.0.1'}}
     context 'when fed no parameters' do
       it 'should contain the eucalyptus::cc class' do
         should contain_class('Eucalyptus::Cc').with({

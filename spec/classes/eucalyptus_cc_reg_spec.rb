@@ -2,7 +2,7 @@
 require 'spec_helper'
 require 'pry'
 
-describe 'eucalyptus::cc::config', :type => :class do
+describe 'eucalyptus::cc::reg', :type => :class do
   context 'input validation' do
 
 #    ['path'].each do |paths|
@@ -78,14 +78,15 @@ describe 'eucalyptus::cc::config', :type => :class do
 #    end#opt_strings
 
   end#input validation
-  context "When on a RedHat-esque system" do
-    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'RedHat'}}
-    context 'when fed no parameters' do
-      #TODO: set custom facts for eucakeys to permit testing of realization of exported file resources.
-      #let(:pre_condition) { ['class{"eucalyptus::Clc": cloud_name => "cloud1", before =>"Class[Eucalyptus::cc]" }', 'eucalyptus::cluster{"mycluster": cloud_name => "cloud1", cluster_name => "cluster1"}' ] }
-      it 'should do something testable' do
-        #pending 'further testwriting'
-      end
-    end#no params
+  context "When on a RedHat system" do
+    let (:facts) {{'osfamily' => 'RedHat', 'operatingsystem' => 'redhat', 'hostname' => 'euca_cc_01', 'ipaddress_eth0' => '10.0.0.1'}}
+    let(:pre_condition) { ['Exec<||>','class{"eucalyptus::Clc": cloud_name => "cloud1", before =>"Class[Eucalyptus::cc]" }', 'eucalyptus::cluster{"mycluster": cloud_name => "cloud1", cluster_name => "cluster1"}' ] }
+    it 'should export the exec which fires euca_conf' do
+      should contain_exec('reg_cc_euca_cc_01').with({
+        :command=>"/usr/sbin/euca_conf --no-rsync --no-sync --no-scp --register-cluster --partition cluster1 --host 10.0.0.1 --component cc_euca_cc_01",
+        :unless=>"/usr/sbin/euca_conf --list-clusters | /bin/grep -q '\\b10.0.0.1\\b'",
+        :tag=>"cloud1"
+      })
+    end
   end
 end
