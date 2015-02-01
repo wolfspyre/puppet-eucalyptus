@@ -47,11 +47,13 @@ Things to change from 3.x for 4.0
 -	**Logs being rotated**
 -	**Packages:**
 	-	eucalyptus-cc **eucalyptus::cc**
+	-	eucalyptus-sc **eucalyptus::sc**
 	-	eucalyptus-nc **eucalyptus::nc**
 	-	drbd83-utils **drbd_config**
 	-	kmod-drbd83 **drbd_config**
 	-	ntp **eucalyptus::ntp**
 -	**Services**
+	-	eucalyptus-cloud **eucalyptus::sc**
 	-	eucalyptus-cc **eucalyptus::cc**
 	-	eucalyptus-nc **eucalyptus::nc**
 	-	eucalyptus-cloud **eucalyptus::jvm**
@@ -135,6 +137,14 @@ The **eucalyptus::ntp** class is responsible for the enablement and configuratio
 -	it enables the `ntp` service
 
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
+
+The **eucalyptus::sc** class is responsible for the installation, configuration, ordering, and enablement of the SC packages and services. It generates the `$registerif` variable via a regex of the `$eucalyptus::conf::vnet_pubinterface` variable, and sets the `$host` variable from the `ipaddress_${registerif}` variable.
+
+The **eucalyptus::sc::config** class is responsible for realizing the certificate files exported from the `eucalyptus::clc::config` services
+
+The **eucalyptus::sc::install** class is responsible for installing the `eucalyptus-sc` package, and enabling the `eucalyptus-cloud` service.
+
+The **eucalyptus::sc::reg** class is responsible for exporting an exec resource by which nodes can register the sc component. It runs `/usr/sbin/euca_conf` with the necessary flags to register the node, unless the *$host* resource is found in the output of `/usr/sbin/euca_conf --list-scs`
 
 ###Hiera Example
 
