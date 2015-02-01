@@ -36,6 +36,7 @@ Things to change from 3.x for 4.0
 	-	/var/lib/eucalyptus
 -	**Files:**`templatized files are displayed like this` *exported files are displayed lile this*
 	-	`/etc/eucalyptus/drbd.conf` created by the **eucalyptus::drbd_resource** defined type and **eucalyptus::drbd_config** class.
+	-	`/etc/ntp.conf` created by **eucalyptus::ntp**
 	-	*/var/lib/eucalyptus/keys/node-cert.pem* exported by the **eucalyptus::cluster** defined type
 	-	*/var/lib/eucalyptus/keys/node-pk.pem* exported by the **eucalyptus::cluster** defined type
 	-	*/var/lib/eucalyptus/keys/cluster-cert.pem* exported by the **eucalyptus::cluster** defined type
@@ -49,10 +50,12 @@ Things to change from 3.x for 4.0
 	-	eucalyptus-nc **eucalyptus::nc**
 	-	drbd83-utils **drbd_config**
 	-	kmod-drbd83 **drbd_config**
+	-	ntp **eucalyptus::ntp**
 -	**Services**
 	-	eucalyptus-cc **eucalyptus::cc**
 	-	eucalyptus-nc **eucalyptus::nc**
 	-	eucalyptus-cloud **eucalyptus::jvm**
+	-	ntp **eucalyptus::ntp**
 
 ###Setup Requirements
 
@@ -124,6 +127,12 @@ The **eucalyptus::nc::config** class is responsible for realizing the certificat
 The **eucalyptus::nc::install** class is responsible for installing the `eucalyptus-nc` package, and enabling the `eucalyptus-nc` service.
 
 The **eucalyptus::nc::reg** class is responsible for realizing the `eucalyptus_config` resource. exporting an exec resource by which nodes can register the nc component. It runs `/usr/sbin/euca_conf` with the necessary flags to register the node, unless the *$host* resource is found in `/etc/eucalyptus/eucalyptus.conf`
+
+The **eucalyptus::ntp** class is responsible for the enablement and configuration of ntp. It is of arguable benefit, and should likely be deprecated in favor of a dependency on a separate module.
+
+-	It installs the `ntp` package
+-	it manages the `/etc/ntp.conf` file
+-	it enables the `ntp` service
 
 The **eucalyptus::repo** class controls the eucalyptus repos. It can be tuned to not manage any yum repos if your setup is managing them elsewhere.
 
