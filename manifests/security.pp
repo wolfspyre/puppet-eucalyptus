@@ -3,7 +3,7 @@
 class eucalyptus::security {
   case $::osfamily {
     'RedHat' : {
-      if $::selinux == 'true' {
+      if $::selinux {
         exec { 'Disable SELinux':
           onlyif  => '/usr/bin/test -f /etc/selinux/config',
           command => "/bin/sed --in-place=.bak 's/enforcing/disabled/g' /etc/selinux/config",
@@ -26,4 +26,3 @@ class eucalyptus::security {
     }
   }
 }
-

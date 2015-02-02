@@ -58,6 +58,8 @@ Things to change from 3.x for 4.0
 	-	eucalyptus-nc **eucalyptus::nc**
 	-	eucalyptus-cloud **eucalyptus::jvm**
 	-	ntp **eucalyptus::ntp**
+	-	iptables **eucalyptus::security**
+	-	selinux **eucalyptus::security**
 
 ###Setup Requirements
 
@@ -146,6 +148,8 @@ The **eucalyptus::sc::install** class is responsible for installing the `eucalyp
 
 The **eucalyptus::sc::reg** class is responsible for exporting an exec resource by which nodes can register the sc component. It runs `/usr/sbin/euca_conf` with the necessary flags to register the node, unless the *$host* resource is found in the output of `/usr/sbin/euca_conf --list-scs`
 
+The **eucalyptus::security** class is ironically responsible for disabling selinux and iptables.
+
 ###Hiera Example
 
 ```
@@ -190,6 +194,9 @@ eucalyptus::conf::vnet_subnet:            '127.0.0.1'
 ## eucalyptus::nc ##############################################################
 eucalyptus::nc::cloud_name:   'cloud1'
 eucalyptus::nc::cluster_name: 'cluster1'
+## eucalyptus::sc ##############################################################
+eucalyptus::sc::cloud_name:   'cloud1'
+eucalyptus::sc::cluster_name: 'cluster1'
 ## eucalyptus::repo ############################################################
 eucalyptus::repo::epel_repo_enable:      true
 eucalyptus::repo::euca2ools_repo_enable: true
