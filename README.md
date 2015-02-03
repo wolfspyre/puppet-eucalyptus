@@ -49,6 +49,7 @@ Things to change from 3.x for 4.0
 	-	eucalyptus-cc **eucalyptus::cc**
 	-	eucalyptus-sc **eucalyptus::sc**
 	-	eucalyptus-nc **eucalyptus::nc**
+	-	wucalyptus-walrus **eucalyptus::walrus**
 	-	drbd83-utils **drbd_config**
 	-	kmod-drbd83 **drbd_config**
 	-	ntp **eucalyptus::ntp**
@@ -150,6 +151,14 @@ The **eucalyptus::sc::reg** class is responsible for exporting an exec resource 
 
 The **eucalyptus::security** class is ironically responsible for disabling selinux and iptables.
 
+The **eucalyptus::walrus** class is responsible for the installation, configuration, ordering, and enablement of the SC packages and services. It generates the `$registerif` variable via a regex of the `$eucalyptus::conf::vnet_pubinterface` variable, and sets the `$host` variable from the `ipaddress_${registerif}` variable.
+
+The **eucalyptus::walrus::config** class is responsible for realizing the *${cloud_name}_euca.p12* certificate files, and exec resources exported from the `eucalyptus::clc::config` services
+
+The **eucalyptus::walrus::install** class is responsible for installing the `eucalyptus-walrus` package, and enabling the `eucalyptus-cloud` service, if it's not already enabled; presumably by cohabitating the sc and the walrus server on the same physical node(s).
+
+The **eucalyptus::walrus::reg** class is responsible for exporting an exec resource tagged with *$cluster* by which nodes can register the walrus component. It runs `/usr/sbin/euca_conf` with the necessary flags to register the node, unless the *$host* resource is found in the output of `/usr/sbin/euca_conf --list-walruses`
+
 ###Hiera Example
 
 ```
@@ -202,6 +211,8 @@ eucalyptus::repo::epel_repo_enable:      true
 eucalyptus::repo::euca2ools_repo_enable: true
 eucalyptus::repo::euca_repo_enable:      true
 eucalyptus::repo::manage_repos:          true
+## eucalyptus::walrus ############################################################
+eucalyptus::walrus::cloud_name: 'cloud1'
 ```
 
 ###Parameters
@@ -267,6 +278,10 @@ eucalyptus::repo::manage_repos:          true
 	-	**euca2ools_repo_enable** *boolean* Default: *true* `Whether or not to add the euca2ools repo`
 	-	**euca_repo_enable** *boolean* Default: *true* `Whether or not to add the eucalyptus repo`
 	-	**manage_repos** *boolean* Default: *true* `Whether or not to manage yumrepos at all with the eucalyptus module`
+
+	-	**eucalyptus::walrus** Class
+
+		-	**cloud_name** *string* Default: *cloud1* `The name of the cloud.`
 
 ##Reference
 

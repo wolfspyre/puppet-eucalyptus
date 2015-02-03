@@ -1,56 +1,21 @@
 class eucalyptus::walrus (
   $cloud_name = 'cloud1',
 ) {
+  validate_string($cloud_name)
   include eucalyptus
   include eucalyptus::conf
 
   Class[eucalyptus] -> Class[eucalyptus::walrus]
 
-  Class[eucalyptus::repo]          ->
-  Package[eucalyptus-walrus]       ->
-  Class[eucalyptus::walrus_config] ->
-  Eucalyptus_config<||>            ->
+  Class[eucalyptus::repo]           ->
+  Package[eucalyptus-walrus]        ->
+  Class[eucalyptus::walrus::config] ->
+  Eucalyptus_config<||>             ->
   Service[eucalyptus-cloud]
 
-  class eucalyptus::walrus_install {
-    package { 'eucalyptus-walrus':
-      ensure => present,
-    }
-
-    if !defined(Service['eucalyptus-cloud']) {
-      service { 'eucalyptus-cloud':
-        ensure  => running,
-        enable  => true,
-        require => Package['eucalyptus-walrus'],
-      }
-    }
-  }
-
-  class eucalyptus::walrus_config inherits eucalyptus::walrus {
-    Exec <<|tag == "${cloud_name}_euca.p12"|>> ->
-    File <<|tag == "${cloud_name}_euca.p12"|>>
-  }
-
   $registerif = regsubst($eucalyptus::conf::vnet_pubinterface, '\.', '_')
-  $host = getvar("ipaddress_${registerif}")
-
-  class eucalyptus::walrus_reg inherits eucalyptus::walrus {
-    @@exec { "reg_walrus_${::hostname}":
-      command  => "/usr/sbin/euca_conf \
-      --no-rsync \
-      --no-scp \
-      --no-sync \
-      --register-walrus \
-      --partition walrus \
-      --host ${host} \
-      --component walrus_${::hostname}",
-      unless   => "/usr/sbin/euca_conf --list-walruses | \
-      /bin/grep '\b${host}\b'",
-      tag      => $cloud_name,
-    }
-  }
-
-  include eucalyptus::walrus_install
-  include eucalyptus::walrus_config
-  include eucalyptus::walrus_reg
+  $host       = getvar("ipaddress_${registerif}")
+  include eucalyptus::walrus::install
+  include eucalyptus::walrus::config
+  include eucalyptus::walrus::reg
 }
